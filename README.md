@@ -42,3 +42,18 @@ npm run dev:users
 npm run dev:techs
 npm run dev:gateway
 ```
+
+---
+
+### Órdenes API (v1.1.0)
+Campos clave:
+- `code`: autogenerado `BH-YYYY-###`
+- `status`: `OPEN → ASSIGNED → IN_PROGRESS → DONE|CANCELED`
+- `priority`: `LOW|MEDIUM|HIGH|URGENT`
+- `materials[]`: `{ name, qty, unit, cost }`
+
+Rutas:
+- `GET /orders?status=&q=`
+- `POST /orders` (valida con zod)
+- `PUT/PATCH /orders/:id` (valida transición)
+- `DELETE /orders/:id` (solo `DONE` o `CANCELED`)
