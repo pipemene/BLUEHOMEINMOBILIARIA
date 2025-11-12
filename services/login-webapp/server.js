@@ -18,7 +18,16 @@ app.get('/config.js', (_req, res) => {
     AUTH_URL: '${(process.env.AUTH_URL || '').replace(/'/g, "\\'")}',
     REDIRECT_URL: '${(process.env.REDIRECT_URL || '').replace(/'/g, "\\'")}',
     REDIRECT_MAP: ${map}
-  };`);
+  });`);
+});
+
+app.use(express.static(publicDir));
+
+const roleViews = ['admin', 'arriendos', 'tecnico', 'contabilidad', 'reparaciones'];
+roleViews.forEach((view) => {
+  app.get(`/${view}`, (_req, res) => {
+    res.sendFile(path.join(publicDir, 'roles', `${view}.html`));
+  });
 });
 
 const roleViews = ['admin', 'arriendos', 'tecnico', 'contabilidad', 'reparaciones'];
