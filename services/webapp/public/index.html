@@ -1,0 +1,61 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Blue Home – Gestor</title>
+<link rel="stylesheet" href="styles.css">
+<script src="/config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+</head><body>
+<header>
+  <h1>Gestor de Órdenes</h1>
+  <div class="filters">
+    <select id="filter-status"><option value="">Todos</option><option>OPEN</option><option>ASSIGNED</option><option>IN_PROGRESS</option><option>DONE</option><option>CANCELED</option></select>
+    <input id="filter-q" placeholder="Buscar...">
+    <button class="btn" id="btn-search">Buscar</button>
+  </div>
+</header>
+<main>
+  <table class="table"><thead><tr><th>Código</th><th>Título</th><th>Estado</th><th>Prioridad</th><th>Cliente</th><th>Acciones</th></tr></thead><tbody id="tbody"></tbody></table>
+</main>
+
+<div id="modal" class="modal"><div class="card">
+  <div class="header-line">
+    <div><div class="section-title">Orden <span id="m-code"></span></div><div class="muted">Estado: <b id="m-status"></b></div></div>
+    <button class="btn secondary" id="m-close">Cerrar</button>
+  </div>
+  <div class="grid">
+    <div>
+      <div class="field"><label>Título</label><input id="m-title"></div>
+      <div class="field"><label>Descripción</label><textarea id="m-desc" rows="5"></textarea></div>
+      <div class="row">
+        <div class="field" style="flex:1"><label>Cliente</label><input id="m-client"></div>
+        <div class="field" style="flex:1"><label>Teléfono</label><input id="m-phone"></div>
+      </div>
+      <div class="row">
+        <div class="field" style="flex:1"><label>Código inmueble</label><input id="m-prop"></div>
+        <div class="field" style="flex:1"><label>Prioridad</label><select id="m-prio"><option>LOW</option><option>MEDIUM</option><option>HIGH</option><option>URGENT</option></select></div>
+      </div>
+      <div class="divider"></div>
+      <div class="actions">
+        <button class="btn" id="m-save">Guardar</button>
+        <select id="m-status-next"></select>
+      </div>
+    </div>
+    <div>
+      <div class="section-title">Fotos</div>
+      <div id="m-photos" class="photo-grid"></div>
+      <input type="file" id="m-photo" accept="image/*">
+      <div class="divider"></div>
+      <div class="section-title">Firmas</div>
+      <div class="field"><label>Cliente</label><canvas id="sign-customer"></canvas><div class="actions"><button class="btn secondary" data-clear="customer">Borrar</button><button class="btn" data-save="customer">Guardar firma</button></div></div>
+      <div class="field"><label>Técnico</label><canvas id="sign-tech"></canvas><div class="actions"><button class="btn secondary" data-clear="tech">Borrar</button><button class="btn" data-save="tech">Guardar firma</button></div></div>
+      <div class="field"><label>Facturación</label><canvas id="sign-billing"></canvas><div class="actions"><button class="btn secondary" data-clear="billing">Borrar</button><button class="btn" data-save="billing">Guardar firma</button></div></div>
+      <div class="divider"></div>
+      <div class="section-title">Factura y descuento</div>
+      <input type="file" id="m-invoice" accept="image/*,application/pdf">
+      <div class="divider"></div>
+      <div class="actions"><button class="btn" id="m-pdf-maint">PDF → Mantenimiento</button><button class="btn" id="m-pdf-bill">PDF → Facturación</button></div>
+    </div>
+  </div>
+</div></div>
+
+<script src="main.js"></script>
+</body></html>

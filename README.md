@@ -1,59 +1,59 @@
-# Blue Home – Gestor de Procesos (Monorepo)
+# BlueHome – Railway Frontend Suite (webapp + uploads + pdf)
 
-Arquitectura **modular** para desplegar en **Railway** con repositorio en **GitHub**.
+Este repo trae **3 servicios** listos para Railway y pensados para integrarse con tu **gateway** actual:
 
-## Estructura
+1) `services/webapp` – Frontend estático (Express) con:
+   - Lista de órdenes con filtros (estado + búsqueda).
+   - Detalle de orden: edición, fotos, **firmas** (SignaturePad), **factura** + **descuento**.
+   - Botones para **PDF → Mantenimiento** y **PDF → Facturación** (usa `pdf-service`).
+
+2) `services/uploads-service` – API para subir **imágenes** y **PDF** a **Cloudinary**.
+   - Endpoint: `POST /upload` con `{ dataUrl, folder }` → `{ url }`.
+
+3) `services/pdf-service` – Genera **PDF** con **Puppeteer** (HTML → PDF) y lo devuelve como **base64**.
+   - Endpoint: `POST /orders/:id/pdf` con `{ stage }` → `{ base64, filename }`.
+   - El servicio **lee la orden** desde tu `GATEWAY_BASE_URL` (`/api/orders/:id`).
+
+> **Nota**: El PDF viene en base64; el frontend lo abre en una pestaña nueva. Si luego quieres **subir el PDF a Cloudinary**, podemos ajustarlo.
+
+## Despliegue rápido en Railway
+1. **Fork o sube** este repo a GitHub.
+2. En Railway, crea **3 servicios** desde el repo, apuntando a:
+   - `services/webapp`
+   - `services/uploads-service`
+   - `services/pdf-service`
+3. Configura variables de entorno:
+
+### `services/webapp`
 ```
-services/
-  gateway/          # API Gateway (proxy hacia módulos)
-  orders-service/   # Órdenes
-  users-service/    # Usuarios
-  techs-service/    # Técnicos
-shared/
-  utils/
-```
-Cada módulo es un servicio independiente que puedes desplegar como **service** distinto en Railway, apuntando al subdirectorio correspondiente.
-
-## Despliegue en Railway (rápido)
-1. Sube este repo a GitHub.
-2. En Railway: **New Project → Deploy from GitHub Repo**.
-3. Crea **4 servicios** desde el mismo repo:
-   - `gateway` → root: `services/gateway`
-   - `orders-service` → root: `services/orders-service`
-   - `users-service` → root: `services/users-service`
-   - `techs-service` → root: `services/techs-service`
-4. En cada servicio configura `NODE_VERSION=18` y `PORT` (Railway inyecta una por defecto).
-5. Copia las URLs públicas de cada microservicio y agrégalas como variables en `gateway`:
-   - `ORDERS_URL=https://...`
-   - `USERS_URL=https://...`
-   - `TECHS_URL=https://...`
-6. Deploy. El `gateway` expondrá:
-   - `GET/POST/PUT/PATCH/DELETE /api/orders/*`
-   - `GET/POST/PUT/PATCH/DELETE /api/users/*`
-   - `GET/POST/PUT/PATCH/DELETE /api/techs/*`
-
-> **Datos**: por defecto hay **almacenamiento en memoria**. Puedes reemplazarlo por Postgres (Railway) creando un adaptador en cada servicio.
-
-## Scripts locales (Node 18+)
-```bash
-npm i
-npm run dev:orders
-npm run dev:users
-npm run dev:techs
-npm run dev:gateway
+PORT=3000
+GATEWAY_BASE_URL=https://<tu-gateway>
+PDF_URL=https://<tu-pdf-service>
+UPLOADS_URL=https://<tu-uploads-service>
 ```
 
----
+### `services/uploads-service`
+```
+PORT=4010
+CLOUDINARY_CLOUD_NAME=
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
+CLOUDINARY_UPLOAD_FOLDER=bluehome/gestor
+```
 
-### Órdenes API (v1.1.0)
-Campos clave:
-- `code`: autogenerado `BH-YYYY-###`
-- `status`: `OPEN → ASSIGNED → IN_PROGRESS → DONE|CANCELED`
-- `priority`: `LOW|MEDIUM|HIGH|URGENT`
-- `materials[]`: `{ name, qty, unit, cost }`
+### `services/pdf-service`
+```
+PORT=4020
+GATEWAY_BASE_URL=https://<tu-gateway>
+```
 
-Rutas:
-- `GET /orders?status=&q=`
-- `POST /orders` (valida con zod)
-- `PUT/PATCH /orders/:id` (valida transición)
-- `DELETE /orders/:id` (solo `DONE` o `CANCELED`)
+4. Abre el `webapp` y prueba:
+   - Filtros → abrir una orden.
+   - Subir foto → se guarda en Cloudinary y se **actualiza la orden** con la URL.
+   - Firmar cliente/técnico/facturación → se sube a Cloudinary y se **guarda en la orden**.
+   - Subir factura (imagen o PDF) + registrar **descuento propietario**.
+   - Generar **PDF** → se abre en nueva pestaña.
+
+## Integración con ManyChat
+- ManyChat puede **consumir el gateway** o **disparar el pdf-service** / **uploads-service** en flujos.
+- Recomendado: exponer endpoints del gateway bajo `/api/...` y usar estos servicios como **infra** de archivos y PDFs.
