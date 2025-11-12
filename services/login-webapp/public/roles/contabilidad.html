@@ -1,0 +1,21 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Contabilidad – Blue Home</title>
+<link rel="stylesheet" href="/styles.css"><script src="/config.js"></script><script src="/guard.js"></script></head><body>
+<div class="header"><div class="brand"><div class="logo">BH</div><div><div class="title">Contabilidad</div><div style="font-size:12px;color:#9aa4b2">Panel</div></div></div>
+<button class="btn" onclick="logout()">Cerrar sesión</button></div>
+<div class="main"><div class="card"><h2>Bienvenido(a) a Contabilidad</h2><div id="info" class="kv"></div>
+<p style="margin-top:12px">Plantilla base lista para conectar al backend.</p></div></div>
+<div class="footer">© Blue Home Inmobiliaria</div>
+<script>
+  const auth = requireAuth();
+  if(auth){
+    const kv = document.getElementById('info');
+    const u = JSON.parse(localStorage.getItem('BH_USER')||'{}');
+    kv.innerHTML = `
+      <label>Usuario</label><div>${u.username || auth.payload.sub}</div>
+      <label>Rol</label><div>${u.role || auth.payload.role}</div>
+      <label>Expira</label><div>${new Date(auth.payload.exp*1000).toLocaleString()}</div>
+      <label>Token (breve)</label><div>${(localStorage.getItem('BH_TOKEN')||'').slice(0,16)}…</div>
+    `;
+  }
+</script></body></html>
