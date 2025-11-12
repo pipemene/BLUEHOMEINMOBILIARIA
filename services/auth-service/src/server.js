@@ -67,19 +67,12 @@ async function fetchUsers () {
     .filter((u) => u.username);
 }
 
-async function verifyPassword (incoming, stored) {
+function verifyPassword (incoming, stored) {
   if (!stored) return false;
-  if (!incoming) return false;
-
-  if (stored.startsWith('$2a$') || stored.startsWith('$2b$') || stored.startsWith('$2y$')) {
-    try {
-      return await bcrypt.compare(incoming, stored);
-    } catch (err) {
-      console.error('Error verificando contraseña bcrypt:', err);
-      return false;
-    }
+  if (stored.startsWith('$2')) {
+    console.warn('⚠️ bcrypt hash detectado, asegúrate de habilitar verificación por bcrypt en el entorno.');
+    return false;
   }
-
   return incoming === stored;
 }
 
@@ -101,7 +94,7 @@ app.post('/auth/login', async (req, res) => {
       return res.status(403).json({ ok: false, error: 'Usuario inactivo' });
     }
 
-    const valid = await verifyPassword(password, user.password);
+    const valid = verifyPassword(password, user.password);
     if (!valid) {
       return res.status(401).json({ ok: false, error: 'Credenciales inválidas' });
     }
