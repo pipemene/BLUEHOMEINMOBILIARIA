@@ -36,9 +36,7 @@
     const auth = requireAuth();
     if (!auth) return null;
 
-    const requiredRoles = (Array.isArray(expected) ? expected : [expected])
-      .filter(Boolean)
-      .map((r) => r.toString().toLowerCase());
+    const requiredRoles = Array.isArray(expected) ? expected : [expected];
     const role = (auth.user.role || auth.payload.role || '').toLowerCase();
     if (!requiredRoles.includes(role)) {
       window.location.href = '/';
