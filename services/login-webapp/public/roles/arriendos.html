@@ -1,21 +1,121 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Arriendos – Blue Home</title>
-<link rel="stylesheet" href="/styles.css"><script src="/config.js"></script><script src="/guard.js"></script></head><body>
-<div class="header"><div class="brand"><div class="logo">BH</div><div><div class="title">Arriendos</div><div style="font-size:12px;color:#9aa4b2">Panel</div></div></div>
-<button class="btn" onclick="logout()">Cerrar sesión</button></div>
-<div class="main"><div class="card"><h2>Bienvenido(a) a Arriendos</h2><div id="info" class="kv"></div>
-<p style="margin-top:12px">Plantilla base lista para conectar al backend.</p></div></div>
-<div class="footer">© Blue Home Inmobiliaria</div>
-<script>
-  const auth = requireAuth();
-  if(auth){
-    const kv = document.getElementById('info');
-    const u = JSON.parse(localStorage.getItem('BH_USER')||'{}');
-    kv.innerHTML = `
-      <label>Usuario</label><div>${u.username || auth.payload.sub}</div>
-      <label>Rol</label><div>${u.role || auth.payload.role}</div>
-      <label>Expira</label><div>${new Date(auth.payload.exp*1000).toLocaleString()}</div>
-      <label>Token (breve)</label><div>${(localStorage.getItem('BH_TOKEN')||'').slice(0,16)}…</div>
-    `;
-  }
-</script></body></html>
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Arriendos – Blue Home</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/config.js"></script>
+  <script src="/guard.js"></script>
+</head>
+<body data-role="arriendos,arrendamiento">
+  <div class="header">
+    <div class="brand">
+      <div class="logo">BH</div>
+      <div>
+        <div class="title">Gestión de arriendos</div>
+        <div class="subtitle">Propiedades, contratos y seguimiento</div>
+      </div>
+    </div>
+    <button class="btn" onclick="logout()">Cerrar sesión</button>
+  </div>
+  <main class="main">
+    <nav class="nav">
+      <a class="nav__link" href="/admin">Administración</a>
+      <a class="nav__link" data-active="true" href="/arriendos">Arriendos</a>
+      <a class="nav__link" href="/tecnico">Técnico</a>
+      <a class="nav__link" href="/contabilidad">Contabilidad</a>
+      <a class="nav__link" href="/reparaciones">Reparaciones</a>
+    </nav>
+
+    <section class="card hero">
+      <h1>Panel de arriendos</h1>
+      <p>Controla la ocupación, las renovaciones y el estado de cada inquilino. Mantén la documentación ordenada y comparte alertas clave con Administración y Contabilidad.</p>
+      <div class="kv" id="user-info"></div>
+    </section>
+
+    <div class="section-grid">
+      <section class="section">
+        <h3>Propiedades destacadas</h3>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Propiedad</th>
+              <th>Estado</th>
+              <th>Próximo hito</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Edificio Parque 305</td>
+              <td><span class="status-pill is-open">Disponible</span></td>
+              <td>Visita agendada 12/04</td>
+            </tr>
+            <tr>
+              <td>Oficina Centro 902</td>
+              <td><span class="status-pill is-progress">Reserva en curso</span></td>
+              <td>Pago garantía 08/04</td>
+            </tr>
+            <tr>
+              <td>Casa Bosques 44</td>
+              <td><span class="status-pill is-done">Arrendada</span></td>
+              <td>Renovación 30/06</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="section">
+        <h3>Alertas de contratos</h3>
+        <ul>
+          <li>
+            <strong>Renovaciones próximas</strong>
+            <p>4 contratos expiran este mes. Coordina firmas con los propietarios.</p>
+          </li>
+          <li>
+            <strong>Garantías pendientes</strong>
+            <p>2 inquilinos con garantía vencida. Escalar a Contabilidad si continúa.</p>
+          </li>
+          <li>
+            <strong>Checklist documentación</strong>
+            <p>Actualiza certificados de pago de gastos comunes y pólizas.</p>
+          </li>
+        </ul>
+      </section>
+
+      <section class="section">
+        <h3>Seguimiento de inquilinos</h3>
+        <ul>
+          <li>
+            <strong>María Castillo – Loft Providencia</strong>
+            <p>Solicitud de descuento por mantención. Coordinando con Reparaciones.</p>
+          </li>
+          <li>
+            <strong>Grupo Tech – Oficina Centro</strong>
+            <p>Renovación en negociación. Ajustar reajuste IPC en contrato.</p>
+          </li>
+          <li>
+            <strong>Juan Morales – Casa Bosques</strong>
+            <p>Pago al día. Próxima inspección semestral 15/05.</p>
+          </li>
+        </ul>
+      </section>
+    </div>
+  </main>
+  <div class="footer">© Blue Home Inmobiliaria</div>
+  <script>
+    const auth = requireRole(document.body.dataset.role);
+    if (auth) {
+      const user = auth.user;
+      const infoEl = document.getElementById('user-info');
+      if (infoEl) {
+        infoEl.innerHTML = `
+          <label>Usuario</label><div>${user.username || auth.payload.sub}</div>
+          <label>Rol</label><div>${(window.canonicalRole ? window.canonicalRole(user.role) : user.role || '').replace(/^./, (c) => c.toUpperCase())}</div>
+          <label>Expira</label><div>${new Date(auth.payload.exp * 1000).toLocaleString()}</div>
+        `;
+      }
+    }
+  </script>
+</body>
+</html>
