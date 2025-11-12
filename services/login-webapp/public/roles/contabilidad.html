@@ -8,113 +8,37 @@
   <script src="/config.js"></script>
   <script src="/guard.js"></script>
 </head>
-<body data-role="contabilidad,finanzas">
+<body data-role="contabilidad">
   <div class="header">
     <div class="brand">
       <div class="logo">BH</div>
       <div>
-        <div class="title">Contabilidad y finanzas</div>
-        <div class="subtitle">Pagos, conciliaciones y reportes</div>
+        <div class="title">Contabilidad</div>
+        <div style="font-size:12px;color:#9aa4b2">Panel</div>
       </div>
     </div>
     <button class="btn" onclick="logout()">Cerrar sesión</button>
   </div>
-  <main class="main">
-    <nav class="nav">
-      <a class="nav__link" href="/admin">Administración</a>
-      <a class="nav__link" href="/arriendos">Arriendos</a>
-      <a class="nav__link" href="/tecnico">Técnico</a>
-      <a class="nav__link" data-active="true" href="/contabilidad">Contabilidad</a>
-      <a class="nav__link" href="/reparaciones">Reparaciones</a>
-    </nav>
-
-    <section class="card hero">
-      <h1>Panel financiero</h1>
-      <p>Monitorea el flujo de caja, los pagos en tránsito y los compromisos con proveedores. Sincroniza información con Arriendos y Reparaciones.</p>
-      <div class="kv" id="user-info"></div>
-    </section>
-
-    <div class="section-grid">
-      <section class="section">
-        <h3>Flujo de caja</h3>
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Concepto</th>
-              <th>Ingreso</th>
-              <th>Egreso</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Arriendos mes actual</td>
-              <td>$ 18.540.000</td>
-              <td>-</td>
-            </tr>
-            <tr>
-              <td>Gastos operativos</td>
-              <td>-</td>
-              <td>$ 6.120.000</td>
-            </tr>
-            <tr>
-              <td>Mantenimiento programado</td>
-              <td>-</td>
-              <td>$ 2.480.000</td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
-
-      <section class="section">
-        <h3>Pagos pendientes</h3>
-        <ul>
-          <li>
-            <strong>Proveedor HVAC</strong>
-            <p>Factura 8921 vence el 09/04. Asociada a orden OT-2145.</p>
-          </li>
-          <li>
-            <strong>Reembolsos postventa</strong>
-            <p>3 casos aprobados por Reparaciones. Transferir esta semana.</p>
-          </li>
-          <li>
-            <strong>Honorarios corredora</strong>
-            <p>Liquidación trimestral pendiente de firma.</p>
-          </li>
-        </ul>
-      </section>
-
-      <section class="section">
-        <h3>Conciliación bancaria</h3>
-        <ul>
-          <li>
-            <strong>Cuenta corriente principal</strong>
-            <p>Saldo conciliado al 05/04. Revisar movimientos extraordinarios.</p>
-          </li>
-          <li>
-            <strong>Cuenta custodias</strong>
-            <p>2 depósitos sin identificar. Solicitar respaldo a Arriendos.</p>
-          </li>
-          <li>
-            <strong>Fondos de garantía</strong>
-            <p>Actualizar rendición mensual a Administración.</p>
-          </li>
-        </ul>
-      </section>
+  <div class="main">
+    <div class="card">
+      <h2>Panel de Contabilidad</h2>
+      <div id="info" class="kv"></div>
+      <p style="margin-top:12px">Visualiza ingresos, egresos y conciliaciones.</p>
     </div>
-  </main>
+  </div>
   <div class="footer">© Blue Home Inmobiliaria</div>
   <script>
-    const auth = requireRole(document.body.dataset.role);
+    const role = document.body.dataset.role;
+    const auth = requireRole(role);
     if (auth) {
+      const kv = document.getElementById('info');
       const user = auth.user;
-      const infoEl = document.getElementById('user-info');
-      if (infoEl) {
-        infoEl.innerHTML = `
-          <label>Usuario</label><div>${user.username || auth.payload.sub}</div>
-          <label>Rol</label><div>${(window.canonicalRole ? window.canonicalRole(user.role) : user.role || '').replace(/^./, (c) => c.toUpperCase())}</div>
-          <label>Expira</label><div>${new Date(auth.payload.exp * 1000).toLocaleString()}</div>
-        `;
-      }
+      kv.innerHTML = `
+        <label>Usuario</label><div>${user.username || auth.payload.sub}</div>
+        <label>Rol</label><div>${user.role || auth.payload.role}</div>
+        <label>Expira</label><div>${new Date(auth.payload.exp * 1000).toLocaleString()}</div>
+        <label>Token (breve)</label><div>${(auth.token || '').slice(0, 16)}…</div>
+      `;
     }
   </script>
 </body>

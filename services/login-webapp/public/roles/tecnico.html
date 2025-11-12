@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Técnico – Blue Home</title>
+  <title>Técnicos – Blue Home</title>
   <link rel="stylesheet" href="/styles.css">
   <script src="/config.js"></script>
   <script src="/guard.js"></script>
@@ -13,112 +13,32 @@
     <div class="brand">
       <div class="logo">BH</div>
       <div>
-        <div class="title">Operaciones técnicas</div>
-        <div class="subtitle">Órdenes de trabajo y cuadrillas</div>
+        <div class="title">Técnicos</div>
+        <div style="font-size:12px;color:#9aa4b2">Panel</div>
       </div>
     </div>
     <button class="btn" onclick="logout()">Cerrar sesión</button>
   </div>
-  <main class="main">
-    <nav class="nav">
-      <a class="nav__link" href="/admin">Administración</a>
-      <a class="nav__link" href="/arriendos">Arriendos</a>
-      <a class="nav__link" data-active="true" href="/tecnico">Técnico</a>
-      <a class="nav__link" href="/contabilidad">Contabilidad</a>
-      <a class="nav__link" href="/reparaciones">Reparaciones</a>
-    </nav>
-
-    <section class="card hero">
-      <h1>Cuadro de órdenes en terreno</h1>
-      <p>Coordina visitas, asigna recursos y haz seguimiento del avance de cada intervención técnica.</p>
-      <div class="kv" id="user-info"></div>
-    </section>
-
-    <div class="section-grid">
-      <section class="section">
-        <h3>Órdenes activas</h3>
-        <table class="table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Ubicación</th>
-              <th>Responsable</th>
-              <th>Estado</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>OT-2145</td>
-              <td>Casa Bosques 44</td>
-              <td>Cuadrilla Norte</td>
-              <td><span class="status-pill is-progress">En ruta</span></td>
-            </tr>
-            <tr>
-              <td>OT-2146</td>
-              <td>Edificio Parque 305</td>
-              <td>Marcos Díaz</td>
-              <td><span class="status-pill is-open">Programada</span></td>
-            </tr>
-            <tr>
-              <td>OT-2147</td>
-              <td>Loft Providencia</td>
-              <td>Cuadrilla Centro</td>
-              <td><span class="status-pill is-done">Finalizada</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
-
-      <section class="section">
-        <h3>Prioridades</h3>
-        <ul>
-          <li>
-            <strong>Visita urgente – Oficina Centro 902</strong>
-            <p>Revisar sistema eléctrico antes de la entrega. Confirmar disponibilidad de técnico certificado.</p>
-          </li>
-          <li>
-            <strong>Coordinación con Reparaciones</strong>
-            <p>Sincronizar avances de postventa para no duplicar visitas.</p>
-          </li>
-          <li>
-            <strong>Inventario de repuestos</strong>
-            <p>Actualizar stock de materiales críticos en bodega principal.</p>
-          </li>
-        </ul>
-      </section>
-
-      <section class="section">
-        <h3>Próximas visitas</h3>
-        <ul>
-          <li>
-            <strong>12/04 – Condominio Río Claro</strong>
-            <p>Mantenimiento preventivo bombas de agua.</p>
-          </li>
-          <li>
-            <strong>14/04 – Casa Lomas 78</strong>
-            <p>Instalación de calefacción. Confirmar repuestos.</p>
-          </li>
-          <li>
-            <strong>16/04 – Edificio Costanera 1205</strong>
-            <p>Inspección general. Coordinar con administración del edificio.</p>
-          </li>
-        </ul>
-      </section>
+  <div class="main">
+    <div class="card">
+      <h2>Panel de Técnicos</h2>
+      <div id="info" class="kv"></div>
+      <p style="margin-top:12px">Administra órdenes de trabajo, asignaciones y estados.</p>
     </div>
-  </main>
+  </div>
   <div class="footer">© Blue Home Inmobiliaria</div>
   <script>
-    const auth = requireRole(document.body.dataset.role);
+    const role = document.body.dataset.role;
+    const auth = requireRole(role);
     if (auth) {
+      const kv = document.getElementById('info');
       const user = auth.user;
-      const infoEl = document.getElementById('user-info');
-      if (infoEl) {
-        infoEl.innerHTML = `
-          <label>Usuario</label><div>${user.username || auth.payload.sub}</div>
-          <label>Rol</label><div>${(window.canonicalRole ? window.canonicalRole(user.role) : user.role || '').replace(/^./, (c) => c.toUpperCase())}</div>
-          <label>Expira</label><div>${new Date(auth.payload.exp * 1000).toLocaleString()}</div>
-        `;
-      }
+      kv.innerHTML = `
+        <label>Usuario</label><div>${user.username || auth.payload.sub}</div>
+        <label>Rol</label><div>${user.role || auth.payload.role}</div>
+        <label>Expira</label><div>${new Date(auth.payload.exp * 1000).toLocaleString()}</div>
+        <label>Token (breve)</label><div>${(auth.token || '').slice(0, 16)}…</div>
+      `;
     }
   </script>
 </body>

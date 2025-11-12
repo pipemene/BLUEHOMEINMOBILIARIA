@@ -3,66 +3,38 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Blue Home – Acceso</title>
+  <title>Blue Home – Login</title>
   <link rel="stylesheet" href="styles.css">
   <script src="/config.js"></script>
 </head>
-<body class="login">
+<body>
   <div class="header">
     <div class="brand">
       <div class="logo">BH</div>
       <div>
-        <div class="title">Blue Home Inmobiliaria</div>
-        <div class="subtitle">Portal unificado de módulos internos</div>
+        <div class="title">Blue Home</div>
+        <div style="font-size:12px;color:#9aa4b2">Gestor – Acceso</div>
       </div>
+    </div>
+    <a href="/" class="btn" style="background:#1f2937;border:1px solid #263143">Login</a>
+  </div>
+  <div class="main">
+    <div class="card">
+      <h2>Iniciar sesión</h2>
+      <form id="f" style="display:grid;gap:10px;max-width:420px">
+        <div>
+          <label>Usuario</label><br>
+          <input id="usuario" style="width:100%;padding:10px;border-radius:8px;border:1px solid #263143;background:#0b1220;color:#e5e7eb">
+        </div>
+        <div>
+          <label>Contraseña</label><br>
+          <input id="password" type="password" style="width:100%;padding:10px;border-radius:8px;border:1px solid #263143;background:#0b1220;color:#e5e7eb">
+        </div>
+        <button class="btn" type="submit">Ingresar</button>
+        <div id="msg" style="color:#ef4444;min-height:18px"></div>
+      </form>
     </div>
   </div>
-  <main class="main login-shell">
-    <section class="card hero">
-      <h1>Bienvenido(a) al panel Blue Home</h1>
-      <p>
-        Para ingresar utiliza el <strong>usuario</strong> y la <strong>contraseña</strong> registrados en la hoja de Google Sheets
-        del equipo. Los permisos disponibles (superadmin, arriendos, técnico, contabilidad y reparaciones) determinan el módulo al que serás redirigido.
-      </p>
-      <p>
-        Puedes revisar o actualizar las credenciales en la hoja <a target="_blank" rel="noopener" href="https://docs.google.com/spreadsheets/d/1VizQYx8-vDENf3_FkQ2fYAdpC993cpR5NmlcSUg2J6w/edit?usp=sharing">Blue Home – Usuarios</a>.
-      </p>
-      <div id="shortcut" class="card shortcut" aria-live="polite">
-        <p>
-          Sesión detectada para <strong id="shortcut-user"></strong> con rol <strong id="shortcut-role"></strong>.
-        </p>
-        <button id="go-panel" class="btn">Ir a mi módulo</button>
-      </div>
-    </section>
-    <div class="login-columns">
-      <section class="card">
-        <h2 style="margin-top:0">Iniciar sesión</h2>
-        <form id="login-form" class="form-grid" autocomplete="off">
-          <div class="form-field">
-            <label for="usuario">Usuario</label>
-            <input id="usuario" name="usuario" type="text" placeholder="usuario@bluehome" autofocus>
-          </div>
-          <div class="form-field">
-            <label for="password">Contraseña</label>
-            <input id="password" name="password" type="password" placeholder="Ingresa tu contraseña">
-          </div>
-          <button class="btn" type="submit">Ingresar</button>
-          <div id="msg" class="status" role="alert" aria-live="assertive"></div>
-        </form>
-      </section>
-      <section class="card">
-        <h2 style="margin-top:0">Roles disponibles</h2>
-        <p>Estos accesos se asignan automáticamente según tu rol en la hoja:</p>
-        <ul>
-          <li><strong>Superadmin</strong> – Control total, métricas generales y accesos rápidos.</li>
-          <li><strong>Arriendos</strong> – Gestión de propiedades, contratos y seguimiento de arriendos.</li>
-          <li><strong>Técnico</strong> – Órdenes de trabajo, asignación de cuadrillas y visitas.</li>
-          <li><strong>Contabilidad</strong> – Estados de pago, conciliaciones y flujo de caja.</li>
-          <li><strong>Reparaciones</strong> – Casos de postventa, avances y entregas.</li>
-        </ul>
-      </section>
-    </div>
-  </main>
   <div class="footer">© Blue Home Inmobiliaria</div>
   <script src="/main.js"></script>
 </body>

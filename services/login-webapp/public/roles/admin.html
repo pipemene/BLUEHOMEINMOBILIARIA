@@ -8,107 +8,37 @@
   <script src="/config.js"></script>
   <script src="/guard.js"></script>
 </head>
-<body data-role="superadmin,admin">
+<body data-role="superadmin">
   <div class="header">
     <div class="brand">
       <div class="logo">BH</div>
       <div>
         <div class="title">Administración</div>
-        <div class="subtitle">Visión general de operaciones</div>
+        <div style="font-size:12px;color:#9aa4b2">Panel</div>
       </div>
     </div>
     <button class="btn" onclick="logout()">Cerrar sesión</button>
   </div>
-  <main class="main">
-    <nav class="nav">
-      <a class="nav__link" data-active="true" href="/admin">Administración</a>
-      <a class="nav__link" href="/arriendos">Arriendos</a>
-      <a class="nav__link" href="/tecnico">Técnico</a>
-      <a class="nav__link" href="/contabilidad">Contabilidad</a>
-      <a class="nav__link" href="/reparaciones">Reparaciones</a>
-    </nav>
-
-    <section class="card hero">
-      <h1>Bienvenido(a), <span id="user-name"></span></h1>
-      <p>Desde aquí puedes monitorear el estado de cada módulo, revisar métricas clave y acceder rápidamente a los tableros especializados.</p>
-      <div class="kv" id="user-info"></div>
-    </section>
-
-    <div class="section-grid">
-      <section class="section">
-        <h3>Resumen diario</h3>
-        <ul>
-          <li>
-            <strong>Contratos renovados</strong>
-            <span class="badge badge--success">+3 en las últimas 24h</span>
-            <p>Comprueba en Arriendos los acuerdos pendientes de firma.</p>
-          </li>
-          <li>
-            <strong>Órdenes técnicas activas</strong>
-            <span class="badge badge--warning">7 en curso</span>
-            <p>Coordina prioridades con el equipo de mantenimiento.</p>
-          </li>
-          <li>
-            <strong>Pagos conciliados</strong>
-            <span class="badge badge--info">92% de avance</span>
-            <p>Verifica saldos y flujos directamente en Contabilidad.</p>
-          </li>
-        </ul>
-      </section>
-
-      <section class="section">
-        <h3>Accesos rápidos</h3>
-        <ul>
-          <li>
-            <strong>Panel de propiedades</strong>
-            <p>Controla disponibilidad, ocupación y documentación desde el módulo de Arriendos.</p>
-          </li>
-          <li>
-            <strong>Órdenes críticas</strong>
-            <p>Dirígete al módulo Técnico para reasignar cuadrillas y fijar nuevas fechas de visita.</p>
-          </li>
-          <li>
-            <strong>Estados financieros</strong>
-            <p>Revisa ingresos por arriendos y egresos operativos en Contabilidad.</p>
-          </li>
-        </ul>
-      </section>
-
-      <section class="section">
-        <h3>Alertas</h3>
-        <ul>
-          <li>
-            <strong>Pagos atrasados</strong>
-            <p>3 arrendatarios superan los 10 días de atraso. Coordina seguimiento con Contabilidad.</p>
-          </li>
-          <li>
-            <strong>Postventa pendiente</strong>
-            <p>Dos casos de reparaciones requieren aprobación de presupuesto.</p>
-          </li>
-          <li>
-            <strong>Documentación</strong>
-            <p>Sube los informes técnicos finalizados al repositorio compartido.</p>
-          </li>
-        </ul>
-      </section>
+  <div class="main">
+    <div class="card">
+      <h2>Bienvenido(a) a Administración</h2>
+      <div id="info" class="kv"></div>
+      <p style="margin-top:12px">Plantilla base lista para conectar al backend.</p>
     </div>
-  </main>
+  </div>
   <div class="footer">© Blue Home Inmobiliaria</div>
   <script>
-    const auth = requireRole(document.body.dataset.role);
+    const role = document.body.dataset.role;
+    const auth = requireRole(role);
     if (auth) {
+      const kv = document.getElementById('info');
       const user = auth.user;
-      const nameEl = document.getElementById('user-name');
-      const infoEl = document.getElementById('user-info');
-      const roleLabel = (window.canonicalRole ? window.canonicalRole(user.role) : user.role) || '';
-      if (nameEl) nameEl.textContent = user.username || auth.payload.sub;
-      if (infoEl) {
-        infoEl.innerHTML = `
-          <label>Usuario</label><div>${user.username || auth.payload.sub}</div>
-          <label>Rol</label><div>${roleLabel.charAt(0).toUpperCase() + roleLabel.slice(1)}</div>
-          <label>Expira</label><div>${new Date(auth.payload.exp * 1000).toLocaleString()}</div>
-        `;
-      }
+      kv.innerHTML = `
+        <label>Usuario</label><div>${user.username || auth.payload.sub}</div>
+        <label>Rol</label><div>${user.role || auth.payload.role}</div>
+        <label>Expira</label><div>${new Date(auth.payload.exp * 1000).toLocaleString()}</div>
+        <label>Token (breve)</label><div>${(auth.token || '').slice(0, 16)}…</div>
+      `;
     }
   </script>
 </body>
