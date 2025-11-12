@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import morgan from 'morgan';
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
 import { google } from 'googleapis';
 
 dotenv.config();
