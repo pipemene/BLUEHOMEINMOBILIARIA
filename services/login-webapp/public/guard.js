@@ -32,6 +32,17 @@
     return { token, payload, user: getStoredUser() };
   }
 
+  function expandExpected (expected) {
+    if (!expected) return [];
+    if (typeof expected === 'string') {
+      expected = expected.split(',').map((item) => item.trim()).filter(Boolean);
+    }
+    if (!Array.isArray(expected)) {
+      expected = [expected];
+    }
+    return expected.map(canonicalRole).filter(Boolean);
+  }
+
   function requireRole (expected) {
     const auth = requireAuth();
     if (!auth) return null;
@@ -54,4 +65,5 @@
   window.requireAuth = requireAuth;
   window.requireRole = requireRole;
   window.logout = logout;
+  window.canonicalRole = canonicalRole;
 })();

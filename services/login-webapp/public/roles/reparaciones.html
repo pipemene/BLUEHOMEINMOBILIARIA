@@ -8,17 +8,116 @@
   <script src="/config.js"></script>
   <script src="/guard.js"></script>
 </head>
+<body data-role="reparaciones,postventa">
 <body data-role="reparaciones">
   <div class="header">
     <div class="brand">
       <div class="logo">BH</div>
       <div>
+        <div class="title">Postventa y reparaciones</div>
+        <div class="subtitle">Seguimiento de incidentes</div>
         <div class="title">Reparaciones</div>
         <div style="font-size:12px;color:#9aa4b2">Panel</div>
       </div>
     </div>
     <button class="btn" onclick="logout()">Cerrar sesión</button>
   </div>
+  <main class="main">
+    <nav class="nav">
+      <a class="nav__link" href="/admin">Administración</a>
+      <a class="nav__link" href="/arriendos">Arriendos</a>
+      <a class="nav__link" href="/tecnico">Técnico</a>
+      <a class="nav__link" href="/contabilidad">Contabilidad</a>
+      <a class="nav__link" data-active="true" href="/reparaciones">Reparaciones</a>
+    </nav>
+
+    <section class="card hero">
+      <h1>Casos de postventa</h1>
+      <p>Revisa y coordina las reparaciones solicitadas por propietarios e inquilinos. Comparte avances con el equipo Técnico y Contabilidad.</p>
+      <div class="kv" id="user-info"></div>
+    </section>
+
+    <div class="section-grid">
+      <section class="section">
+        <h3>Casos abiertos</h3>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Ticket</th>
+              <th>Propiedad</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>RP-8802</td>
+              <td>Edificio Parque 305</td>
+              <td><span class="status-pill is-progress">Presupuesto enviado</span></td>
+            </tr>
+            <tr>
+              <td>RP-8803</td>
+              <td>Condominio Río Claro</td>
+              <td><span class="status-pill is-open">En evaluación</span></td>
+            </tr>
+            <tr>
+              <td>RP-8804</td>
+              <td>Casa Bosques 44</td>
+              <td><span class="status-pill is-done">Cerrado</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="section">
+        <h3>Prioridad alta</h3>
+        <ul>
+          <li>
+            <strong>Filtración en Loft Providencia</strong>
+            <p>Coordinar visita conjunta con Técnico. Inquilino disponible 11/04.</p>
+          </li>
+          <li>
+            <strong>Daño estructural leve – Casa Lomas 78</strong>
+            <p>Esperando informe de aseguradora. Mantener actualizado a Administración.</p>
+          </li>
+          <li>
+            <strong>Pintura exterior – Edificio Costanera</strong>
+            <p>Solicitar aprobación de presupuesto revisado por proveedor.</p>
+          </li>
+        </ul>
+      </section>
+
+      <section class="section">
+        <h3>Próximos hitos</h3>
+        <ul>
+          <li>
+            <strong>10/04 – Reunión con proveedor HVAC</strong>
+            <p>Definir plan de acción para reclamos recurrentes.</p>
+          </li>
+          <li>
+            <strong>15/04 – Entrega de departamento piloto</strong>
+            <p>Validar checklist con equipo Comercial.</p>
+          </li>
+          <li>
+            <strong>18/04 – Auditoría de postventa</strong>
+            <p>Preparar documentación con casos cerrados y pendientes.</p>
+          </li>
+        </ul>
+      </section>
+    </div>
+  </main>
+  <div class="footer">© Blue Home Inmobiliaria</div>
+  <script>
+    const auth = requireRole(document.body.dataset.role);
+    if (auth) {
+      const user = auth.user;
+      const infoEl = document.getElementById('user-info');
+      if (infoEl) {
+        infoEl.innerHTML = `
+          <label>Usuario</label><div>${user.username || auth.payload.sub}</div>
+          <label>Rol</label><div>${(window.canonicalRole ? window.canonicalRole(user.role) : user.role || '').replace(/^./, (c) => c.toUpperCase())}</div>
+          <label>Expira</label><div>${new Date(auth.payload.exp * 1000).toLocaleString()}</div>
+        `;
+      }
   <div class="main">
     <div class="card">
       <h2>Panel de Reparaciones</h2>
