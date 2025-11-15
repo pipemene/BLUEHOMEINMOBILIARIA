@@ -1,10 +1,98 @@
-// Simple JWT payload decode
-function decodeJwt (t){ try{ const p=t.split('.')[1]; return JSON.parse(atob(p.replace(/-/g,'+').replace(/_/g,'/')));}catch{return null;} }
-function requireAuth(){
-  const token = localStorage.getItem('BH_TOKEN');
-  if(!token){ window.location.href = '/'; return null; }
-  const payload = decodeJwt(token);
-  if(!payload){ localStorage.removeItem('BH_TOKEN'); window.location.href = '/'; return null; }
-  return { token, payload };
-}
-function logout(){ localStorage.removeItem('BH_TOKEN'); localStorage.removeItem('BH_USER'); window.location.href = '/'; }
+(function () {
+  const ROLE_ALIASES = {
+    superadmin: ['superadmin', 'admin', 'administrador'],
+    arriendos: ['arriendos', 'arrendamiento', 'arriendo'],
+    tecnico: ['tecnico', 'técnico', 'tecnicos', 'ordenes', 'órdenes', 'ordenes de trabajo'],
+    contabilidad: ['contabilidad', 'contable', 'finanzas'],
+    reparaciones: ['reparaciones', 'postventa', 'post venta']
+  };
+
+  function normalize (value) {
+    return (value || '')
+      .toString()
+      .trim()
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/\s+/g, ' ');
+  }
+
+  function canonicalRole (role) {
+    const clean = normalize(role);
+    for (const key of Object.keys(ROLE_ALIASES)) {
+      if (ROLE_ALIASES[key].includes(clean)) {
+        return key;
+      }
+    }
+    return clean;
+  }
+
+  function decodeJwt (token) {
+    try {
+      const payload = token.split('.')[1];
+      return JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')));
+    } catch {
+      return null;
+    }
+  }
+
+  function getStoredUser () {
+    try {
+      return JSON.parse(localStorage.getItem('BH_USER') || '{}');
+    } catch {
+      return {};
+    }
+  }
+
+  function requireAuth () {
+    const token = localStorage.getItem('BH_TOKEN');
+    if (!token) {
+      window.location.href = '/';
+      return null;
+    }
+    const payload = decodeJwt(token);
+    if (!payload) {
+      localStorage.removeItem('BH_TOKEN');
+      localStorage.removeItem('BH_USER');
+      window.location.href = '/';
+      return null;
+    }
+    return { token, payload, user: getStoredUser() };
+  }
+
+  function expandExpected (expected) {
+    if (!expected) return [];
+    if (typeof expected === 'string') {
+      expected = expected.split(',').map((item) => item.trim()).filter(Boolean);
+    }
+    if (!Array.isArray(expected)) {
+      expected = [expected];
+    }
+    return expected.map(canonicalRole).filter(Boolean);
+  }
+
+  function requireRole (expected) {
+    const auth = requireAuth();
+    if (!auth) return null;
+
+    const requiredRoles = expandExpected(expected);
+    const role = canonicalRole(auth.user.role || auth.payload.role);
+    if (!requiredRoles.length || requiredRoles.includes(role)) {
+      return auth;
+    }
+
+    window.location.href = '/';
+    return null;
+  }
+
+  function logout () {
+    localStorage.removeItem('BH_TOKEN');
+    localStorage.removeItem('BH_USER');
+    window.location.href = '/';
+  }
+
+  window.requireAuth = requireAuth;
+  window.requireRole = requireRole;
+  window.logout = logout;
+  window.canonicalRole = canonicalRole;
+})();
