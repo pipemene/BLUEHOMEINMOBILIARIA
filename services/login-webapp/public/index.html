@@ -8,6 +8,11 @@
   <script src="/config.js"></script>
 </head>
 <body class="login">
+  <title>Blue Home – Login</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="/config.js"></script>
+</head>
+<body>
   <div class="header">
     <div class="brand">
       <div class="logo">BH</div>
@@ -63,6 +68,29 @@
       </section>
     </div>
   </main>
+        <div class="title">Blue Home</div>
+        <div style="font-size:12px;color:#9aa4b2">Gestor – Acceso</div>
+      </div>
+    </div>
+    <a href="/" class="btn" style="background:#1f2937;border:1px solid #263143">Login</a>
+  </div>
+  <div class="main">
+    <div class="card">
+      <h2>Iniciar sesión</h2>
+      <form id="f" style="display:grid;gap:10px;max-width:420px">
+        <div>
+          <label>Usuario</label><br>
+          <input id="usuario" style="width:100%;padding:10px;border-radius:8px;border:1px solid #263143;background:#0b1220;color:#e5e7eb">
+        </div>
+        <div>
+          <label>Contraseña</label><br>
+          <input id="password" type="password" style="width:100%;padding:10px;border-radius:8px;border:1px solid #263143;background:#0b1220;color:#e5e7eb">
+        </div>
+        <button class="btn" type="submit">Ingresar</button>
+        <div id="msg" style="color:#ef4444;min-height:18px"></div>
+      </form>
+    </div>
+  </div>
   <div class="footer">© Blue Home Inmobiliaria</div>
   <script src="/main.js"></script>
 </body>

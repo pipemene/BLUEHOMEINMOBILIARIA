@@ -1,32 +1,4 @@
-(function () {
-  const ROLE_ALIASES = {
-    superadmin: ['superadmin', 'admin', 'administrador'],
-    arriendos: ['arriendos', 'arrendamiento', 'arriendo'],
-    tecnico: ['tecnico', 'técnico', 'tecnicos', 'ordenes', 'órdenes', 'ordenes de trabajo'],
-    contabilidad: ['contabilidad', 'contable', 'finanzas'],
-    reparaciones: ['reparaciones', 'postventa', 'post venta']
-  };
-
-  function normalize (value) {
-    return (value || '')
-      .toString()
-      .trim()
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/\s+/g, ' ');
-  }
-
-  function canonicalRole (role) {
-    const clean = normalize(role);
-    for (const key of Object.keys(ROLE_ALIASES)) {
-      if (ROLE_ALIASES[key].includes(clean)) {
-        return key;
-      }
-    }
-    return clean;
-  }
-
+(function(){
   function decodeJwt (token) {
     try {
       const payload = token.split('.')[1];
@@ -75,14 +47,13 @@
     const auth = requireAuth();
     if (!auth) return null;
 
-    const requiredRoles = expandExpected(expected);
-    const role = canonicalRole(auth.user.role || auth.payload.role);
-    if (!requiredRoles.length || requiredRoles.includes(role)) {
-      return auth;
+    const requiredRoles = Array.isArray(expected) ? expected : [expected];
+    const role = (auth.user.role || auth.payload.role || '').toLowerCase();
+    if (!requiredRoles.includes(role)) {
+      window.location.href = '/';
+      return null;
     }
-
-    window.location.href = '/';
-    return null;
+    return auth;
   }
 
   function logout () {

@@ -13,5 +13,12 @@ window.__CFG__ = window.__CFG__ || {
     finanzas: '/contabilidad',
     reparaciones: '/reparaciones',
     postventa: '/reparaciones'
+  REDIRECT_URL: 'http://localhost:3010/admin',
+  REDIRECT_MAP: {
+    superadmin: 'http://localhost:3010/admin',
+    arrendamiento: 'http://localhost:3010/arriendos',
+    tecnico: 'http://localhost:3010/tecnico',
+    contabilidad: 'http://localhost:3010/contabilidad',
+    reparaciones: 'http://localhost:3010/reparaciones'
   }
 };

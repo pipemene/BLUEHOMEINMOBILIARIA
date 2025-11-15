@@ -52,59 +52,28 @@ async function fetchUsers () {
   if (!rows.length) return [];
 
   const [headers, ...data] = rows;
-  const normalizeHeader = (value) => (value || '')
-    .toString()
-    .trim()
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/\s+/g, ' ');
-  const idx = (keys) => {
-    const targets = Array.isArray(keys) ? keys : [keys];
-    return headers.findIndex((header) => {
-      const normalized = normalizeHeader(header);
-      return targets.some((key) => normalized === key);
-    });
-  };
-  const uI = idx(['usuario', 'correo', 'email']);
-  const pI = idx(['contrasena', 'contraseña', 'password']);
-  const rI = idx(['rol', 'role']);
-  const aI = idx(['activo', 'activa', 'estado', 'estatus']);
+  const idx = (key) => headers.findIndex((h) => (h || '').toString().toLowerCase().trim() === key);
+  const uI = idx('usuario');
+  const pI = idx('contrasena');
+  const rI = idx('rol');
+  const aI = idx('activo');
   return data
     .map((row) => ({
       username: (row[uI] || '').toString().trim().toLowerCase(),
       password: (row[pI] || '').toString(),
       role: (row[rI] || '').toString().trim().toLowerCase(),
-      is_active: aI >= 0 ? parseActive(row[aI]) : true
+      is_active: aI >= 0 ? ((row[aI] || '').toString().toLowerCase() === 'true') : true
     }))
     .filter((u) => u.username);
 }
 
-async function verifyPassword (incoming, stored) {
+function verifyPassword (incoming, stored) {
   if (!stored) return false;
-  if (!incoming) return false;
-
-  if (stored.startsWith('$2a$') || stored.startsWith('$2b$') || stored.startsWith('$2y$')) {
-    try {
-      return await bcrypt.compare(incoming, stored);
-    } catch (err) {
-      console.error('Error verificando contraseña bcrypt:', err);
-      return false;
-    }
+  if (stored.startsWith('$2')) {
+    console.warn('⚠️ bcrypt hash detectado, asegúrate de habilitar verificación por bcrypt en el entorno.');
+    return false;
   }
-
   return incoming === stored;
-}
-
-function parseActive (value) {
-  const normalized = (value || '')
-    .toString()
-    .trim()
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '');
-  if (!normalized) return true;
-  return ['true', '1', 'si', 'activo', 'activa', 'yes', 'habilitado', 'habilitada'].includes(normalized);
 }
 
 app.get('/', (_req, res) => res.json({ ok: true, service: 'auth-service' }));
@@ -125,7 +94,7 @@ app.post('/auth/login', async (req, res) => {
       return res.status(403).json({ ok: false, error: 'Usuario inactivo' });
     }
 
-    const valid = await verifyPassword(password, user.password);
+    const valid = verifyPassword(password, user.password);
     if (!valid) {
       return res.status(401).json({ ok: false, error: 'Credenciales inválidas' });
     }
