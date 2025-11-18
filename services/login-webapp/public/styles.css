@@ -271,6 +271,42 @@ input[type="password"]:focus {
   font-size: 15px;
 }
 
+.apps-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.app-card {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px;
+  display: grid;
+  gap: 10px;
+  background: rgba(13, 23, 42, 0.8);
+  min-height: 180px;
+}
+
+.app-card header {
+  display: grid;
+  gap: 6px;
+}
+
+.app-card__tag {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.app-card__actions {
+  margin-top: auto;
+}
+
+.empty {
+  color: var(--muted);
+}
+
 .badge {
   padding: 4px 10px;
   border-radius: 999px;

@@ -17,11 +17,11 @@
   };
 
   const DEFAULT_ROUTES = {
-    superadmin: '/admin',
-    arriendos: '/arriendos',
-    tecnico: '/tecnico',
-    contabilidad: '/contabilidad',
-    reparaciones: '/reparaciones'
+    superadmin: '/dashboard',
+    arriendos: '/dashboard',
+    tecnico: '/dashboard',
+    contabilidad: '/dashboard',
+    reparaciones: '/dashboard'
   };
 
   hydrateShortcut();
