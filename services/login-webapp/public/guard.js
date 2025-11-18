@@ -1,4 +1,32 @@
-(function(){
+(function () {
+  const ROLE_ALIASES = {
+    superadmin: ['superadmin', 'admin', 'administrador'],
+    arriendos: ['arriendos', 'arrendamiento', 'arriendo'],
+    tecnico: ['tecnico', 'técnico', 'tecnicos'],
+    contabilidad: ['contabilidad', 'contable', 'finanzas'],
+    reparaciones: ['reparaciones', 'postventa', 'post venta']
+  };
+
+  function normalizeText (value) {
+    return (value || '')
+      .toString()
+      .trim()
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/\s+/g, ' ');
+  }
+
+  function canonicalRole (role) {
+    const clean = normalizeText(role);
+    for (const key of Object.keys(ROLE_ALIASES)) {
+      if (ROLE_ALIASES[key].includes(clean)) {
+        return key;
+      }
+    }
+    return clean;
+  }
+
   function decodeJwt (token) {
     try {
       const payload = token.split('.')[1];
@@ -24,9 +52,7 @@
     }
     const payload = decodeJwt(token);
     if (!payload) {
-      localStorage.removeItem('BH_TOKEN');
-      localStorage.removeItem('BH_USER');
-      window.location.href = '/';
+      logout();
       return null;
     }
     return { token, payload, user: getStoredUser() };
@@ -47,8 +73,10 @@
     const auth = requireAuth();
     if (!auth) return null;
 
-    const requiredRoles = Array.isArray(expected) ? expected : [expected];
-    const role = (auth.user.role || auth.payload.role || '').toLowerCase();
+    const requiredRoles = expandExpected(expected);
+    if (!requiredRoles.length) return auth;
+
+    const role = canonicalRole(auth.user.role || auth.payload.role);
     if (!requiredRoles.includes(role)) {
       window.location.href = '/';
       return null;
