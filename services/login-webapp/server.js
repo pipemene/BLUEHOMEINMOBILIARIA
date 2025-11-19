@@ -62,6 +62,10 @@ app.get('/', (_req, res) => {
   res.sendFile(path.join(publicDir, 'index.html'));
 });
 
+app.get('/dashboard', (_req, res) => {
+  res.sendFile(path.join(publicDir, 'dashboard.html'));
+});
+
 ROLE_VIEWS.forEach((view) => {
   app.get(`/${view}`, (_req, res) => {
     res.sendFile(path.join(publicDir, 'roles', `${view}.html`));

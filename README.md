@@ -10,7 +10,9 @@ Soporta bcrypt (si `password_hash` inicia con `$2`), o texto plano (solo pruebas
 
 ### Variables
 
-**auth-service**
+Cada servicio incluye un `.env.example` con los campos **exactos** que debes crear en Railway → Variables.
+
+**auth-service** (`services/auth-service/.env.example`)
 ```
 PORT=4015
 JWT_SECRET=<secreto>
@@ -20,9 +22,12 @@ GOOGLE_SERVICE_ACCOUNT_B64=<json key en base64>
 ALLOWED_ORIGINS=https://tu-webapp.up.railway.app,http://localhost:3010
 ```
 
-**login-webapp**
+**login-webapp** (`services/login-webapp/.env.example`)
 ```
 PORT=3010
 AUTH_URL=https://<auth-service>.up.railway.app
-REDIRECT_URL=https://<tu-panel>.up.railway.app
+REDIRECT_URL=/dashboard
+REDIRECT_MAP={"admin":"/dashboard","arriendos":"/dashboard"}
 ```
+
+Solo debes copiar/pegar cada par `CLAVE=valor` en Railway para que ambos deploys queden configurados.

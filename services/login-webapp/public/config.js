@@ -1,19 +1,19 @@
 window.__CFG__ = Object.assign(
   {
     AUTH_URL: 'http://localhost:4015',
-    REDIRECT_URL: '/admin',
+    REDIRECT_URL: '/dashboard',
     REDIRECT_MAP: {
-      superadmin: '/admin',
-      admin: '/admin',
-      administrador: '/admin',
-      arrendamiento: '/arriendos',
-      arriendos: '/arriendos',
-      tecnico: '/tecnico',
-      técnico: '/tecnico',
-      contabilidad: '/contabilidad',
-      finanzas: '/contabilidad',
-      reparaciones: '/reparaciones',
-      postventa: '/reparaciones'
+      superadmin: '/dashboard',
+      admin: '/dashboard',
+      administrador: '/dashboard',
+      arrendamiento: '/dashboard',
+      arriendos: '/dashboard',
+      tecnico: '/dashboard',
+      técnico: '/dashboard',
+      contabilidad: '/dashboard',
+      finanzas: '/dashboard',
+      reparaciones: '/dashboard',
+      postventa: '/dashboard'
     }
   },
   window.__CFG__ || {}
