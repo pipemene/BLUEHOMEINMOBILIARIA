@@ -17,12 +17,100 @@
   };
 
   const DEFAULT_ROUTES = {
-    superadmin: '/admin',
-    arriendos: '/arriendos',
-    tecnico: '/tecnico',
-    contabilidad: '/contabilidad',
-    reparaciones: '/reparaciones'
+    superadmin: '/dashboard',
+    arriendos: '/dashboard',
+    tecnico: '/dashboard',
+    contabilidad: '/dashboard',
+    reparaciones: '/dashboard'
   };
+
+  hydrateShortcut();
+
+  if (form) {
+    form.addEventListener('submit', onSubmit);
+  }
+
+  async function onSubmit (event) {
+    event.preventDefault();
+
+    const usuarioInput = document.getElementById('usuario');
+    const passwordInput = document.getElementById('password');
+
+    const identity = sanitizeIdentity(usuarioInput?.value);
+    const password = passwordInput ? passwordInput.value : '';
+
+    if (!identity || !password) {
+      updateStatus('Ingresa usuario y contraseña', 'error');
+      return;
+    }
+
+    updateStatus('Validando credenciales…', 'info');
+
+    try {
+      const response = await fetch(`${AUTH_BASE}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ usuario: identity, password })
+      });
+
+      const data = await parseResponse(response);
+      if (!response.ok || !data.ok) {
+        throw new Error(data?.error || 'Credenciales inválidas');
+      }
+
+      localStorage.setItem('BH_TOKEN', data.token);
+      localStorage.setItem('BH_USER', JSON.stringify(data.user));
+
+      updateStatus('Ingreso exitoso, preparando tu panel…', 'success');
+
+      const target = computeTarget(data.user?.role);
+      setTimeout(() => { window.location.href = target; }, 400);
+    } catch (err) {
+      console.error(err);
+      updateStatus(friendlyError(err), 'error');
+    }
+  }
+
+  function hydrateShortcut () {
+    if (!shortcut || !goPanelBtn) return;
+    const token = localStorage.getItem('BH_TOKEN');
+    const user = safeUser();
+    if (!token || !user || !user.role) {
+      shortcut.classList.remove('is-visible');
+      return;
+    }
+    const target = computeTarget(user.role);
+    shortcut.classList.add('is-visible');
+    if (shortcutUser) shortcutUser.textContent = user.username || user.usuario || 'usuario';
+    if (shortcutRole) shortcutRole.textContent = titleCase(canonicalRole(user.role));
+    goPanelBtn.onclick = () => { window.location.href = target; };
+  }
+
+  function sanitizeIdentity (value) {
+    return (value || '')
+      .toString()
+      .trim()
+      .toLowerCase();
+  }
+
+  function updateStatus (message, variant) {
+    if (!msg) return;
+    msg.textContent = message;
+    msg.classList.remove('is-error', 'is-success');
+    if (variant === 'error') msg.classList.add('is-error');
+    if (variant === 'success') msg.classList.add('is-success');
+  }
+
+  function sanitizeBaseUrl (value) {
+    if (!value) return '';
+    try {
+      const trimmed = value.toString().trim();
+      if (!trimmed) return '';
+      return trimmed.replace(/\/+$/, '');
+    } catch {
+      return '';
+    }
+  }
 
   function normalizeText (value) {
     return (value || '')
@@ -82,166 +170,23 @@
     return map[canonical] || C.REDIRECT_URL || DEFAULT_ROUTES[canonical] || '/';
   }
 
-  function hydrateShortcut () {
-    if (!shortcut || !goPanelBtn) return;
-    const token = localStorage.getItem('BH_TOKEN');
-    const user = safeUser();
-    if (!token || !user || !user.role) {
-      shortcut.classList.remove('is-visible');
-      return;
-    }
-    const target = computeTarget(user.role);
-    shortcut.classList.add('is-visible');
-    if (shortcutUser) shortcutUser.textContent = user.username || user.usuario || 'usuario';
-    if (shortcutRole) shortcutRole.textContent = titleCase(canonicalRole(user.role));
-    goPanelBtn.onclick = () => { window.location.href = target; };
-  }
-
-  hydrateShortcut();
-
-  if (!form) return;
-
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const usuarioInput = document.getElementById('usuario');
-    const passwordInput = document.getElementById('password');
-
-    const identity = sanitizeIdentity(usuarioInput?.value);
-    const password = passwordInput ? passwordInput.value : '';
-
-    if (!identity || !password) {
-      updateStatus('Ingresa usuario y contraseña', 'error');
-      return;
-    }
-
-    updateStatus('Validando credenciales…', 'info');
-
-    try {
-      const response = await fetch(`${AUTH_BASE}/auth/login`, {
-(function(){
-  const C = window.__CFG__ || {};
-  const form = document.getElementById('f');
-  if (!form) return;
-
-  const msg = document.getElementById('msg');
-
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    if (msg) {
-      msg.style.color = '#e5e7eb';
-      msg.textContent = 'Validando…';
-    }
-
-    const usuarioInput = document.getElementById('usuario');
-    const emailInput = document.getElementById('email');
-    const passwordInput = document.getElementById('password');
-
-    const identity = (usuarioInput?.value || emailInput?.value || '').trim();
-    const password = passwordInput ? passwordInput.value : '';
-
-    if (!identity || !password) {
-      if (msg) {
-        msg.style.color = '#ef4444';
-        msg.textContent = 'Ingresa usuario y contraseña';
-      }
-      return;
-    }
-
-    try {
-      const r = await fetch((C.AUTH_URL || '') + '/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ usuario: identity, password })
-      });
-      const data = await parseResponse(response);
-      if (!response.ok || !data.ok) {
-        throw new Error(data.error || 'Credenciales inválidas');
-      const data = await r.json();
-      if (!r.ok || !data.ok) {
-        throw new Error(data.error || 'Error de autenticación');
-      }
-
-      localStorage.setItem('BH_TOKEN', data.token);
-      localStorage.setItem('BH_USER', JSON.stringify(data.user));
-
-      updateStatus('Ingreso exitoso, preparando tu panel…', 'success');
-
-      const target = computeTarget(data.user?.role);
-      setTimeout(() => { window.location.href = target; }, 400);
-    } catch (err) {
-      console.error(err);
-      updateStatus(friendlyError(err), 'error');
-    }
-  });
-
-  function sanitizeIdentity (value) {
-    return (value || '')
-      .toString()
-      .trim()
-      .toLowerCase();
-  }
-
-  function updateStatus (message, variant) {
-    if (!msg) return;
-    msg.textContent = message;
-    msg.classList.remove('is-error', 'is-success');
-    if (variant === 'error') msg.classList.add('is-error');
-    if (variant === 'success') msg.classList.add('is-success');
-  }
-
-  function sanitizeBaseUrl (value) {
-    if (!value) return '';
-    try {
-      const trimmed = value.toString().trim();
-      if (!trimmed) return '';
-      return trimmed.replace(/\/+$/, '');
-    } catch {
-      return '';
-    }
-  }
-
   async function parseResponse (response) {
+    const contentType = response.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+      return response.json();
+    }
     const text = await response.text();
-    if (!text) return {};
     try {
       return JSON.parse(text);
     } catch {
-      if (!response.ok) {
-        throw new Error(`Error ${response.status} en el servicio de autenticación`);
-      }
-      throw new Error('Respuesta inesperada del servicio de autenticación');
+      return { ok: false, error: text || 'Respuesta inesperada del servidor' };
     }
   }
 
-  function friendlyError (error) {
-    const raw = error?.message || 'Error de autenticación';
-    const lower = raw.toLowerCase();
-    if (lower.includes('failed to fetch') || lower.includes('network') || lower.includes('fetch')) {
-      return 'No se pudo conectar con el servicio de autenticación. Verifica que esté en línea y que la variable AUTH_URL apunte a la URL correcta.';
-    }
-    if (lower.includes('error 404')) {
-      return 'El servicio de autenticación no reconoce la ruta /auth/login. Revisa la variable AUTH_URL.';
-    }
-    if (lower.includes('respuesta inesperada')) {
-      return 'La respuesta del servicio de autenticación no es válida.';
-    }
-    return raw;
+  function friendlyError (err) {
+    if (!err) return 'Error desconocido';
+    if (typeof err === 'string') return err;
+    if (err.message) return err.message;
+    return 'No fue posible validar tus credenciales';
   }
-      if (msg) {
-        msg.style.color = '#22c55e';
-        msg.textContent = 'Ingreso exitoso…';
-      }
-
-      const role = (data.user?.role || '').toLowerCase();
-      const map = C.REDIRECT_MAP || {};
-      const target = map[role] || C.REDIRECT_URL || '/';
-      setTimeout(() => { window.location.href = target; }, 400);
-    } catch (err) {
-      if (msg) {
-        msg.style.color = '#ef4444';
-        msg.textContent = err.message || 'Error';
-      }
-    }
-  });
 })();
