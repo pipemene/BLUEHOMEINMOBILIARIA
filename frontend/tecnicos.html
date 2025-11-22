@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Blue Home | Técnicos</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <main class="app-card">
+      <section class="app-card__left">
+        <header class="navbar">
+          <div class="logo-mark">
+            <div class="logo-mark__chip">BH</div>
+            <div class="logo-mark__text">
+              <span class="logo-mark__title">BLUE HOME</span>
+              <span class="logo-mark__subtitle">Gestión de técnicos</span>
+            </div>
+          </div>
+          <nav class="nav-links">
+            <a href="./dashboard.html">Dashboard</a>
+            <a href="./orders.html">Órdenes</a>
+            <a href="./tecnicos.html" class="active">Técnicos</a>
+            <a href="./facturacion.html">Facturación</a>
+          </nav>
+        </header>
+
+        <section style="margin-top: 8px;">
+          <div class="badge">
+            <span class="badge-dot"></span>
+            <span>Maqueta visual de técnicos</span>
+          </div>
+
+          <h1 class="page-title" style="margin-top: 10px;">Técnicos</h1>
+          <p class="page-subtitle">
+            Luego se conecta al backend para ver carga de trabajo, zonas y rendimiento.
+          </p>
+
+          <div class="cards-grid" style="margin-top: 16px;">
+            <article class="card">
+              <div class="card-tag-row">
+                <h2 class="card-title">Técnicos activos</h2>
+                <span class="badge-soft">Hoy</span>
+              </div>
+              <div class="card-metric">−</div>
+              <p class="card-desc">Se llenará cuando definamos el modelo de técnicos.</p>
+            </article>
+            <article class="card">
+              <div class="card-tag-row">
+                <h2 class="card-title">Órdenes asignadas</h2>
+                <span class="badge-soft">Total</span>
+              </div>
+              <div class="card-metric">−</div>
+              <p class="card-desc">Órdenes vinculadas al equipo técnico.</p>
+            </article>
+            <article class="card">
+              <div class="card-tag-row">
+                <h2 class="card-title">Tiempo promedio</h2>
+                <span class="badge-soft">Servicio</span>
+              </div>
+              <div class="card-metric">−</div>
+              <p class="card-desc">Tiempo promedio desde reporte hasta cierre.</p>
+            </article>
+          </div>
+
+          <div class="notice">
+            <strong>Próximo paso:</strong> cuando el backend tenga /api/tecnicos,
+            esta pantalla mostrará tabla, ficha por técnico y relación con órdenes.
+          </div>
+        </section>
+      </section>
+
+      <aside class="app-card__right">
+        <h2 style="font-size:16px; margin-bottom:10px;">Ideas para este módulo</h2>
+        <ul style="font-size:13px; color: var(--muted); padding-left: 18px; display:flex; flex-direction:column; gap:6px;">
+          <li>Ficha con foto, teléfono, skills y zonas.</li>
+          <li>Historial de órdenes atendidas.</li>
+          <li>Disponibilidad en tiempo real para asignar trabajos.</li>
+        </ul>
+      </aside>
+    </main>
+  </div>
+</body>
+</html>
