@@ -35,8 +35,8 @@
 
         <form class="form" id="loginForm">
           <div class="field">
-            <label for="email">Correo corporativo</label>
-            <input class="input" id="email" type="email" placeholder="tucorreo@bluehomeinmo.co" required />
+            <label for="email">Usuario</label>
+            <input class="input" id="email" type="text" placeholder="usuario en Google Sheets" required />
           </div>
 
           <div class="field">
@@ -46,13 +46,14 @@
 
           <div class="button-row">
             <span class="helper-text">
-              Por ahora solo valida formato. Luego lo conectamos al backend real de usuarios.
+              Se valida contra la hoja de usuarios en Google Sheets.
             </span>
             <button class="button" type="submit">
               Entrar
               <span style="font-size: 16px;">→</span>
             </button>
           </div>
+          <p class="helper-text" id="loginFeedback"></p>
         </form>
 
         <div class="notice">
@@ -64,9 +65,41 @@
   </div>
 
   <script>
-    document.getElementById('loginForm').addEventListener('submit', function (e) {
+    const API_BASE_URL = 'http://localhost:8080/api';
+    const form = document.getElementById('loginForm');
+    const feedback = document.getElementById('loginFeedback');
+
+    form.addEventListener('submit', async function (e) {
       e.preventDefault();
-      window.location.href = './dashboard.html';
+      feedback.textContent = 'Validando contra Google Sheets...';
+      feedback.style.color = 'var(--muted)';
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/login`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            email: document.getElementById('email').value,
+            password: document.getElementById('password').value
+          })
+        });
+
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          throw new Error(data.message || 'No se pudo iniciar sesión.');
+        }
+
+        localStorage.setItem('bhUser', JSON.stringify(data.data));
+        feedback.textContent = 'Ingreso correcto, redireccionando...';
+        feedback.style.color = 'var(--success)';
+        window.location.href = './dashboard.html';
+      } catch (err) {
+        console.error(err);
+        feedback.textContent = err.message || 'Error al validar credenciales.';
+        feedback.style.color = 'var(--danger)';
+      }
     });
   </script>
 </body>
