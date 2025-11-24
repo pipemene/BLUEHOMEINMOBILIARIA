@@ -2,7 +2,7 @@
   const ROLE_ALIASES = {
     superadmin: ['superadmin', 'admin', 'administrador'],
     arriendos: ['arriendos', 'arrendamiento', 'arriendo'],
-    tecnico: ['tecnico', 'técnico', 'tecnicos'],
+    tecnico: ['tecnico', 'técnico', 'tecnicos', 'ordenes', 'órdenes', 'ordenes de trabajo'],
     contabilidad: ['contabilidad', 'contable', 'finanzas'],
     reparaciones: ['reparaciones', 'postventa', 'post venta']
   };
