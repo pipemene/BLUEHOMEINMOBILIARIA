@@ -109,6 +109,9 @@
   </div>
 
   <script>
+    const DEFAULT_API_BASE = `${window.location.origin.replace(/\/$/, '')}/api`;
+    const API_BASE_URL =
+      window.API_BASE_URL || document.querySelector('meta[name="api-base-url"]')?.content || DEFAULT_API_BASE;
     const API_BASE_URL = 'http://localhost:8080/api';
 
     async function loadOrders() {

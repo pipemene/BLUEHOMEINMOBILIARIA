@@ -139,6 +139,10 @@ async function fetchOrdersData() {
 app.get('/api/health', (req, res) => res.json({ status: 'ok', service: 'gestor-backend' }));
 
 app.post('/api/login', async (req, res) => {
+  const { email, username, password } = req.body || {};
+  const providedUser = (username || email || '').toString().trim();
+  if (!providedUser || !password) {
+    return res.status(400).json({ success: false, message: 'Usuario y contraseña son obligatorios.' });
   const { email, password } = req.body || {};
   if (!email || !password) {
     return res.status(400).json({ success: false, message: 'Correo y contraseña son obligatorios.' });
@@ -146,6 +150,8 @@ app.post('/api/login', async (req, res) => {
 
   try {
     const users = await fetchUsersFromSheet();
+    const normalizedUser = providedUser.toLowerCase();
+    const user = users.find((u) => u.email === normalizedUser && u.password === password);
     const normalizedEmail = email.toString().trim().toLowerCase();
     const user = users.find((u) => u.email === normalizedEmail && u.password === password);
 
