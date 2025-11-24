@@ -109,8 +109,7 @@
   </div>
 
   <script>
-    const API_BASE_URL = 'https://bluehomeinmobiliaria-production.up.railway.app';
-    const API_KEY = 'Blu3h0m32016#';
+    const API_BASE_URL = 'http://localhost:8080/api';
 
     async function loadOrders() {
       const tbody = document.getElementById('ordersBody');
@@ -123,17 +122,16 @@
       if (codigo) params.append('inmuebleCodigo', codigo);
       if (tecnico) params.append('tecnicoAsignado', tecnico);
 
-      const url = `${API_BASE_URL}/api/orders?${params.toString()}`;
+      const url = `${API_BASE_URL}/orders?${params.toString()}`;
 
       try {
         const res = await fetch(url, {
           headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': API_KEY
+            'Content-Type': 'application/json'
           }
         });
         const data = await res.json();
-        if (!data.ok) throw new Error(data.message || 'Error');
+        if (!res.ok || !data.success) throw new Error(data.message || 'Error');
 
         const orders = data.data || [];
         if (!orders.length) {

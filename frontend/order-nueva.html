@@ -100,8 +100,7 @@
   </div>
 
   <script>
-    const API_BASE_URL = 'https://bluehomeinmobiliaria-production.up.railway.app';
-    const API_KEY = 'Blu3h0m32016#';
+    const API_BASE_URL = 'http://localhost:8080/api';
 
     document.getElementById('newOrderForm').addEventListener('submit', async function (e) {
       e.preventDefault();
@@ -118,16 +117,15 @@
       };
 
       try {
-        const res = await fetch(`${API_BASE_URL}/api/orders`, {
+        const res = await fetch(`${API_BASE_URL}/orders`, {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': API_KEY
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify(payload)
         });
         const data = await res.json();
-        if (!data.ok) throw new Error(data.message || 'Error');
+        if (!res.ok || !data.success) throw new Error(data.message || 'Error');
 
         alert('Orden creada correctamente.');
         window.location.href = `order.html?id=${encodeURIComponent(data.data.id)}`;
