@@ -126,8 +126,9 @@
   </div>
 
   <script>
-    const API_BASE_URL = 'https://bluehomeinmobiliaria-production.up.railway.app';
-    const API_KEY = 'Blu3h0m32016#';
+    const DEFAULT_API_BASE = `${window.location.origin.replace(/\/$/, '')}/api`;
+    const API_BASE_URL =
+      window.API_BASE_URL || document.querySelector('meta[name="api-base-url"]')?.content || DEFAULT_API_BASE;
     const params = new URLSearchParams(window.location.search);
     const ORDER_ID = params.get('id');
 
@@ -138,14 +139,13 @@
 
     async function loadOrder() {
       try {
-        const res = await fetch(`${API_BASE_URL}/api/orders/${ORDER_ID}`, {
+        const res = await fetch(`${API_BASE_URL}/orders/${ORDER_ID}`, {
           headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': API_KEY
+            'Content-Type': 'application/json'
           }
         });
         const data = await res.json();
-        if (!data.ok) throw new Error(data.message || 'Error');
+        if (!res.ok || !data.success) throw new Error(data.message || 'Error');
         const o = data.data;
 
         document.getElementById('orderCode').textContent = o.code || 'Orden';
@@ -189,16 +189,15 @@
       };
 
       try {
-        const res = await fetch(`${API_BASE_URL}/api/orders/${ORDER_ID}`, {
+        const res = await fetch(`${API_BASE_URL}/orders/${ORDER_ID}`, {
           method: 'PUT',
           headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': API_KEY
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify(payload)
         });
         const data = await res.json();
-        if (!data.ok) throw new Error(data.message || 'Error');
+        if (!res.ok || !data.success) throw new Error(data.message || 'Error');
         alert('Orden actualizada correctamente.');
         loadOrder();
       } catch (err) {

@@ -141,20 +141,20 @@
   </div>
 
   <script>
-    const API_BASE_URL = 'https://bluehomeinmobiliaria-production.up.railway.app';
-    const API_KEY = 'Blu3h0m32016#';
+    const DEFAULT_API_BASE = `${window.location.origin.replace(/\/$/, '')}/api`;
+    const API_BASE_URL =
+      window.API_BASE_URL || document.querySelector('meta[name="api-base-url"]')?.content || DEFAULT_API_BASE;
 
     async function loadDashboard() {
       const tbody = document.getElementById('recentOrdersBody');
       try {
-        const res = await fetch(`${API_BASE_URL}/api/orders`, {
+        const res = await fetch(`${API_BASE_URL}/orders`, {
           headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': API_KEY
+            'Content-Type': 'application/json'
           }
         });
         const data = await res.json();
-        if (!data.ok) throw new Error(data.message || 'Error al cargar');
+        if (!res.ok || !data.success) throw new Error(data.message || 'Error al cargar');
 
         const orders = data.data || [];
         document.getElementById('metricAbiertas').textContent =
