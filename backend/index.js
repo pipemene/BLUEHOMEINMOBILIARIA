@@ -4,7 +4,17 @@ const { google } = require('googleapis');
 require('dotenv').config();
 
 const app = express();
-app.use(cors());
+const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN;
+const allowedOrigins = FRONTEND_ORIGIN
+  ? FRONTEND_ORIGIN.split(',').map((o) => o.trim()).filter(Boolean)
+  : ['*'];
+const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY;
+
+app.use(
+  cors({
+    origin: allowedOrigins.includes('*') ? true : allowedOrigins
+  })
+);
 app.use(express.json());
 
 const SPREADSHEET_ID = process.env.GOOGLE_SHEETS_SPREADSHEET_ID;
