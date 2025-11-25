@@ -4,8 +4,6 @@
 1. Copia `.env.example` a `.env` y completa:
    - `GOOGLE_CLIENT_EMAIL` y `GOOGLE_PRIVATE_KEY` del service account.
    - `GOOGLE_SHEETS_SPREADSHEET_ID` y rangos si usas nombres distintos.
-   - `INTERNAL_API_KEY` para proteger `/api/debug/sheets` (se envía en `x-internal-api-key`).
-   - `FRONTEND_ORIGIN` con el/los orígenes permitidos (separados por coma) para CORS.
 2. Comparte la hoja con el correo del service account (al menos lectura/escritura).
 
 ## Endpoints útiles

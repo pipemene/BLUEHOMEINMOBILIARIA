@@ -63,7 +63,7 @@ function getSheetsClient() {
   }
 
   const privateKey = process.env.GOOGLE_PRIVATE_KEY
-    ? process.env.GOOGLE_PRIVATE_KEY.replace(/\n/g, '\n')
+    ? process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n')
     : undefined;
 
   const auth = new google.auth.GoogleAuth({
@@ -75,22 +75,6 @@ function getSheetsClient() {
   });
 
   return google.sheets({ version: 'v4', auth });
-}
-
-function formatSheetsError(error) {
-  if (error?.response?.data?.error?.message) {
-    return error.response.data.error.message;
-  }
-  return error?.message || 'Error desconocido al conectar con Google Sheets';
-}
-
-function requireInternalKey(req, res, next) {
-  if (!INTERNAL_API_KEY) return next();
-  const providedKey = req.headers['x-internal-api-key'] || req.query.key;
-  if (providedKey !== INTERNAL_API_KEY) {
-    return res.status(401).json({ success: false, message: 'No autorizado (falta API key interna).' });
-  }
-  return next();
 }
 
 async function readSheet(range) {
@@ -164,56 +148,22 @@ async function fetchOrdersData() {
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok', service: 'gestor-backend' }));
 
-app.get('/api/debug/sheets', requireInternalKey, async (req, res) => {
-  const envStatus = {
-    spreadsheetId: !!SPREADSHEET_ID,
-    clientEmail: !!process.env.GOOGLE_CLIENT_EMAIL,
-    privateKey: !!process.env.GOOGLE_PRIVATE_KEY
-  };
-
-  try {
-    const userValues = await readSheet(USERS_RANGE);
-    const orderValues = await readSheet(ORDERS_RANGE);
-
-    const userHeaders = userValues[0] || [];
-    const orderHeaders = orderValues[0] || [];
-
-    return res.json({
-      success: true,
-      env: envStatus,
-      users: {
-        rows: Math.max(userValues.length - 1, 0),
-        headers: userHeaders,
-        range: USERS_RANGE
-      },
-      orders: {
-        rows: Math.max(orderValues.length - 1, 0),
-        headers: orderHeaders,
-        range: ORDERS_RANGE
-      }
-    });
-  } catch (error) {
-    console.error('Error en /api/debug/sheets', error);
-    return res.status(500).json({
-      success: false,
-      env: envStatus,
-      message: 'No se pudo conectar o leer las hojas en Google Sheets',
-      error: formatSheetsError(error)
-    });
-  }
-});
-
 app.post('/api/login', async (req, res) => {
   const { email, username, password } = req.body || {};
   const providedUser = (username || email || '').toString().trim();
   if (!providedUser || !password) {
     return res.status(400).json({ success: false, message: 'Usuario y contraseña son obligatorios.' });
+  const { email, password } = req.body || {};
+  if (!email || !password) {
+    return res.status(400).json({ success: false, message: 'Correo y contraseña son obligatorios.' });
   }
 
   try {
     const users = await fetchUsersFromSheet();
     const normalizedUser = providedUser.toLowerCase();
     const user = users.find((u) => u.email === normalizedUser && u.password === password);
+    const normalizedEmail = email.toString().trim().toLowerCase();
+    const user = users.find((u) => u.email === normalizedEmail && u.password === password);
 
     if (!user) {
       return res.status(401).json({ success: false, message: 'Usuario o contraseña incorrectos.' });
@@ -229,9 +179,7 @@ app.post('/api/login', async (req, res) => {
     });
   } catch (error) {
     console.error('Error en /api/login', error);
-    return res
-      .status(500)
-      .json({ success: false, message: 'No se pudo validar el usuario', error: formatSheetsError(error) });
+    return res.status(500).json({ success: false, message: 'No se pudo validar el usuario', error: error.message });
   }
 });
 
@@ -256,9 +204,7 @@ app.get('/api/orders', async (req, res) => {
     return res.json({ success: true, data: filtered });
   } catch (error) {
     console.error('Error en GET /api/orders', error);
-    return res
-      .status(500)
-      .json({ success: false, message: 'No se pudieron cargar las órdenes', error: formatSheetsError(error) });
+    return res.status(500).json({ success: false, message: 'No se pudieron cargar las órdenes', error: error.message });
   }
 });
 
@@ -275,9 +221,7 @@ app.get('/api/orders/:id', async (req, res) => {
     return res.json({ success: true, data: order });
   } catch (error) {
     console.error('Error en GET /api/orders/:id', error);
-    return res
-      .status(500)
-      .json({ success: false, message: 'No se pudo obtener la orden', error: formatSheetsError(error) });
+    return res.status(500).json({ success: false, message: 'No se pudo obtener la orden', error: error.message });
   }
 });
 
@@ -317,9 +261,7 @@ app.post('/api/orders', async (req, res) => {
     return res.status(201).json({ success: true, data: newOrder });
   } catch (error) {
     console.error('Error en POST /api/orders', error);
-    return res
-      .status(500)
-      .json({ success: false, message: 'No se pudo crear la orden', error: formatSheetsError(error) });
+    return res.status(500).json({ success: false, message: 'No se pudo crear la orden', error: error.message });
   }
 });
 
@@ -359,9 +301,7 @@ app.put('/api/orders/:id', async (req, res) => {
     return res.json({ success: true, data: updatedOrder });
   } catch (error) {
     console.error('Error en PUT /api/orders/:id', error);
-    return res
-      .status(500)
-      .json({ success: false, message: 'No se pudo actualizar la orden', error: formatSheetsError(error) });
+    return res.status(500).json({ success: false, message: 'No se pudo actualizar la orden', error: error.message });
   }
 });
 
